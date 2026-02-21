@@ -1,271 +1,128 @@
-# 💬 ChatApp — Desktop Chat Application
+# 💬 ChattingApplication
 
-A real-world desktop chat application built with **Java Swing + TCP Sockets + SQLite**.  
-Supports user registration, login, global chat, and private messaging — all running locally on your machine.
+A simple multi-client desktop chat application built with **Java Swing** (GUI) and **Java Sockets** (networking). No database, no authentication — just connect and chat!
 
 ---
 
 ## 📁 Project Structure
 
 ```
-ChatApplication/
-├── src/
-│   └── com/chatapp/
-│       ├── client/
-│       │   ├── ChatClient.java          # Socket connection to server
-│       │   └── gui/
-│       │       ├── LoginFrame.java      # Login window
-│       │       ├── RegisterFrame.java   # Register window
-│       │       ├── ChatFrame.java       # Main chat window
-│       │       ├── ContactPanel.java    # Online users list
-│       │       └── MessagePanel.java    # Chat message area
-│       ├── server/
-│       │   ├── ChatServer.java          # Server entry point
-│       │   ├── ClientHandler.java       # Per-client thread
-│       │   └── SessionManager.java      # Track online users
-│       ├── model/
-│       │   ├── User.java                # User entity
-│       │   └── Message.java             # Message entity
-│       ├── dao/
-│       │   ├── UserDAO.java             # User DB operations
-│       │   └── MessageDAO.java          # Message DB operations
-│       ├── service/
-│       │   ├── AuthService.java         # Login/Register logic
-│       │   └── MessageService.java      # Message business logic
-│       └── util/
-│           ├── DBConnection.java        # SQLite connection + schema setup
-│           ├── PasswordUtil.java        # BCrypt hashing
-│           └── Constants.java           # App-wide constants
-├── sql/
-│   ├── schema.sql                       # Table definitions (reference)
-│   └── seed.sql                         # Sample data
-├── pom.xml                              # Maven build file
-└── README.md
+ChattingApplication/
+└── src/
+    └── com/chatapp/
+        ├── model/
+        │   └── Message.java           ← Shared message class
+        ├── server/
+        │   ├── ChatServer.java        ← Server entry point
+        │   └── ClientHandler.java     ← Handles each client connection
+        └── client/
+            ├── ChatClient.java        ← Client entry point (main method here)
+            └── gui/
+                ├── LoginFrame.java    ← Login screen
+                ├── DashboardFrame.java← Online users list
+                └── ChatFrame.java     ← Chat window
 ```
 
 ---
 
-## 🛠️ Tech Stack
+## ⚙️ Requirements
 
-| Layer            | Technology               |
-|------------------|--------------------------|
-| GUI              | Java Swing               |
-| Real-time chat   | Java Sockets (TCP)       |
-| Database         | SQLite via JDBC          |
-| Password hashing | BCrypt (jbcrypt 0.4)     |
-| Build tool       | Maven                    |
-| Java version     | Java 17+                 |
+- Java JDK 8 or above
+- Eclipse IDE (any edition)
+- No external libraries needed!
 
 ---
 
-## ⚙️ Prerequisites
+## 🚀 How to Run
 
-Make sure you have the following installed:
+### Step 1 — Import Project in Eclipse
+- Open Eclipse
+- File → Import → Existing Projects into Workspace
+- Select your `ChattingApplication` folder
 
-- **Java 17+** → `java -version`
-- **Maven 3.8+** → `mvn -version`
+### Step 2 — Run the Server
+- Open `ChatServer.java`
+- Right click → **Run As → Java Application**
+- You should see: `Chat Server started on port 12345`
 
-That's it — SQLite is embedded, no external DB server needed.
+### Step 3 — Run the Client
+- Open `ChatClient.java`
+- Right click → **Run As → Java Application**
+- Login screen will appear — enter your name and click **Join**
 
----
-
-## 🚀 How to Build & Run
-
-### 1. Clone / Open the project
-
-```bash
-cd ChatApplication
-```
-
-### 2. Build — creates two fat JARs
-
-```bash
-mvn clean package
-```
-
-This generates inside `target/`:
-- `ChatServer.jar` — the server
-- `ChatClient.jar` — the client (run multiple instances)
+### Step 4 — Run Multiple Clients
+- Repeat Step 3 to open more clients
+- Each client enters a different name
+- They will see each other in the online users list
 
 ---
 
-### 3. Start the Server
+## 💡 How to Chat
 
-Open a terminal and run:
-
-```bash
-java -jar target/ChatServer.jar
-```
-
-Expected output:
-```
-[10:00:00] [SERVER] Server started on port 9090
-[10:00:00] [DB] SQLite driver loaded.
-[10:00:00] [DB] Table ready: users
-[10:00:00] [DB] Table ready: messages
-[10:00:00] [SERVER] Waiting for clients...
-```
-
-> The database file `chatapp.db` is auto-created in the same directory on first run.
+1. Enter your name on the login screen and click **Join**
+2. You will see the **Dashboard** showing all online users
+3. **Double click** on any user to send a chat request
+4. The other user will see a popup — they can **Accept** or **Decline**
+5. If accepted, a **Chat Window** opens for both users
+6. Type your message and press **Enter** or click **Send**
 
 ---
 
-### 4. Launch Clients
+## 📨 Message Types
 
-Open one or more new terminals and run:
-
-```bash
-java -jar target/ChatClient.jar
-```
-
-The **Login window** will appear. You can:
-- Click **Register** to create a new account
-- Then **Login** to enter the chat
-
-> Launch multiple clients to chat between users!
+| Type           | Description                        |
+|----------------|------------------------------------|
+| `JOIN`         | Client connects with a username    |
+| `LEAVE`        | Client disconnects                 |
+| `USER_LIST`    | Server sends online users list     |
+| `CHAT_REQUEST` | User A requests to chat with User B|
+| `CHAT_ACCEPT`  | User B accepts the request         |
+| `CHAT_DECLINE` | User B declines the request        |
+| `MESSAGE`      | Actual chat message between users  |
 
 ---
 
-## 💡 Features
+## 🎨 Features
 
-| Feature                  | Details                                          |
-|--------------------------|--------------------------------------------------|
-| 🔐 Register / Login      | BCrypt-hashed passwords stored in SQLite         |
-| 💬 Global Chat           | Broadcast messages to all online users           |
-| 🔒 Private Messages      | Click a user in the contact list to PM them      |
-| 🟢 Online User List      | Contact panel updates live as users join/leave   |
-| 📜 Chat History          | Last 50 messages loaded when you connect         |
-| 🌙 Dark Theme UI         | Full dark-mode Swing GUI (Catppuccin palette)    |
-| 🔌 Graceful Disconnect   | Server notifies all users when someone leaves    |
+- ✅ Dark theme UI throughout
+- ✅ Multiple clients can connect simultaneously
+- ✅ See who is online in real time
+- ✅ Chat request → Accept / Decline flow
+- ✅ Message bubbles (blue = sent, grey = received)
+- ✅ Auto scroll to latest message
+- ✅ Press Enter to send message
 
 ---
 
-## 🔧 Chat Commands
+## 🔧 Configuration
 
-These can be typed in the message box:
+Server runs on `localhost` port `12345` by default.
 
-| Command              | Description                        |
-|----------------------|------------------------------------|
-| `/pm username text`  | Send a private message             |
-| `/list`              | List all online users in chat      |
-| `/quit`              | Disconnect from the server         |
+To change the port, update these two lines:
 
----
-
-## 🏗️ Architecture Overview
-
-```
-┌─────────────────────┐        TCP Socket (port 9090)       ┌──────────────────────┐
-│     ChatClient      │ ──────────────────────────────────► │     ChatServer       │
-│                     │                                      │                      │
-│  LoginFrame         │  1. Send username on connect         │  ClientHandler       │
-│  RegisterFrame      │  2. Send messages as plain text      │  (one per client)    │
-│  ChatFrame          │  3. Receive broadcast messages       │                      │
-│  ContactPanel       │  4. Receive /userlist updates        │  SessionManager      │
-│  MessagePanel       │ ◄────────────────────────────────── │  (singleton)         │
-└─────────────────────┘                                      └──────────┬───────────┘
-         │                                                              │
-         │  AuthService                                                 │
-         │  → UserDAO ──────────────────────────────────────────► SQLite DB
-         │  → MessageDAO                                          (chatapp.db)
-         │  PasswordUtil (BCrypt)
+**In `ChatServer.java`:**
+```java
+private static final int PORT = 12345;
 ```
 
-### Message Flow
-
-```
-User types message → ChatClient.sendMessage()
-  → Socket → ClientHandler.run()
-    → SessionManager.broadcastAll()
-      → each ClientHandler.sendMessage()
-        → Socket → ChatClient listener thread
-          → SwingUtilities.invokeLater()
-            → ChatFrame.receiveMessage()
-              → MessagePanel.addMessage()  ← bubble appears in UI
-```
-
-### Private Message Flow (`/pm`)
-
-```
-User types → /pm alice hello
-  → ClientHandler detects "/pm" prefix
-    → SessionManager.getClient("alice")
-      → target.sendMessage("[PM from bob] hello")
-        → alice's MessagePanel shows the PM bubble
+**In `ChatClient.java`:**
+```java
+private static final int SERVER_PORT = 12345;
 ```
 
 ---
 
-## 🗄️ Database Schema
+## 🛣️ Future Plans
 
-```sql
--- Users table
-CREATE TABLE users (
-    id            INTEGER PRIMARY KEY AUTOINCREMENT,
-    username      TEXT    NOT NULL UNIQUE COLLATE NOCASE,
-    password_hash TEXT    NOT NULL,
-    created_at    DATETIME DEFAULT (datetime('now')),
-    last_seen     DATETIME
-);
-
--- Messages table
-CREATE TABLE messages (
-    id         INTEGER PRIMARY KEY AUTOINCREMENT,
-    sender     TEXT    NOT NULL,
-    receiver   TEXT,                          -- NULL = global message
-    content    TEXT    NOT NULL,
-    is_private INTEGER NOT NULL DEFAULT 0,    -- 0 = global, 1 = private
-    sent_at    DATETIME DEFAULT (datetime('now')),
-    FOREIGN KEY (sender)   REFERENCES users(username) ON DELETE CASCADE,
-    FOREIGN KEY (receiver) REFERENCES users(username) ON DELETE SET NULL
-);
-```
-
----
-
-## 🔒 Security Notes
-
-- Passwords are **never stored in plain text** — BCrypt with cost factor 12
-- Login returns a **generic error** ("Invalid username or password") to prevent username enumeration
-- Input is **validated and sanitized** before hitting the database
-- All DB queries use **PreparedStatements** — no SQL injection possible
-
----
-
-## 🧪 Running Tests
-
-```bash
-mvn test
-```
-
----
-
-## 📦 Dependencies (auto-downloaded by Maven)
-
-| Library         | Version   | Purpose                  |
-|-----------------|-----------|--------------------------|
-| sqlite-jdbc     | 3.45.1.0  | SQLite database driver   |
-| jbcrypt         | 0.4       | BCrypt password hashing  |
-| junit-jupiter   | 5.10.2    | Unit testing             |
-
----
-
-## 🐛 Troubleshooting
-
-**"Connection refused" on client launch**
-→ Make sure `ChatServer.jar` is running first.
-
-**"SQLite driver not found"**
-→ Run `mvn clean package` again to pull dependencies.
-
-**Black/blank Swing window on Linux**
-→ Add `-Dawt.useSystemAAFontSettings=on` to the java command.
-
-**Port 9090 already in use**
-→ Change `SERVER_PORT` in `Constants.java` and rebuild.
+- [ ] Chat history (save previous messages)
+- [ ] Group chat support
+- [ ] File sharing
+- [ ] User authentication (login/register)
+- [ ] Database integration
 
 ---
 
 ## 👨‍💻 Author
 
-Built with Java — Swing · Sockets · SQLite · BCrypt
+Built as a learning project to understand Java Networking and Swing GUI.
+```
